@@ -1,7 +1,6 @@
-# Claude Code internal/user-local state
-.claude/projects/
-.claude/worktrees/
-.claude/plans/
+# Claude Code repo docs plus internal/user-local state
+.claude/*
+!.claude/release-checklist.md
 
 # Codex local/project-local state
 .codex/
