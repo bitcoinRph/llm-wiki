@@ -9,7 +9,7 @@
 
 [github.com/nvk/llm-wiki](https://github.com/nvk/llm-wiki)
 
-LLM-compiled knowledge bases for any AI agent. Parallel multi-agent research, thesis-driven investigation, source ingestion, wiki compilation, truth-seeking audits, querying, and artifact generation. Ships as a Claude Code plugin, an OpenAI Codex plugin, an OpenCode instruction file, or a portable AGENTS.md for any other LLM agent. Obsidian-compatible.
+LLM-compiled knowledge bases for any AI agent. Parallel multi-agent research, collector catalogs, thesis-driven investigation, source ingestion, wiki compilation, truth-seeking audits, querying, and artifact generation. Ships as a Claude Code plugin, an OpenAI Codex plugin, an OpenCode instruction file, or a portable AGENTS.md for any other LLM agent. Obsidian-compatible.
 
 ---
 
@@ -18,6 +18,8 @@ LLM-compiled knowledge bases for any AI agent. Parallel multi-agent research, th
 ---
 
 ## Changelog
+
+**v0.10.0** — **Collector catalogs.** Added `/wiki:collect` for provenance-rich catalogs of examples, artifacts, media, memes, tools, entities, and source candidates. Collect infers scale, captures aliases and found-in-context provenance, handles binaries as referenced assets by default, writes `output/collect-...` catalogs, and promotes only selected durable subsets into inventory, raw sources, wiki articles, or datasets.
 
 **v0.9.0** — **Topic archive lifecycle.** Whole topic wikis can now be archived under `topics/.archive/` so old interests stay preserved but out of normal context. Query, ingest, compile, research, output, inventory, datasets, projects, librarian, refresh, audit, lint, init, and routing now distinguish active material from explicitly included archived context.
 
@@ -28,8 +30,6 @@ LLM-compiled knowledge bases for any AI agent. Parallel multi-agent research, th
 **v0.8.5** — **Safer lint defaults.** Hub-level lint now stays scoped to the shared registry instead of recursively auditing every topic by accident, and `lint --fix` preserves absent lazy `inventory/` and `datasets/` layers unless those layers already exist or the current workflow needs them.
 
 **v0.8.4** — **Portable iCloud hub resolution.** Shared wiki folders now survive moving between Macs with different `/Users/<name>/...` paths: agents prefer portable `hub_path`, treat legacy `resolved_path` values as fallback caches, resolve `wikis.json` paths relative to the current hub, and fall back to populated `topics/<slug>/` directories when registry entries are stale or unreadable.
-
-**v0.8.0** — **Inventory tracking and dataset manifests.** Added first-class `/wiki:inventory` for durable items, candidates, entities, corpora, saved views, and opinionated migration previews, plus `/wiki:dataset` manifests for large or external datasets that should be indexed by the wiki without being copied into it. Lint, query, ingest, research, audit, plan, and output workflows now know how to surface inventory and dataset state while keeping raw evidence, compiled knowledge, and generated artifacts separate.
 
 ## Install
 
@@ -59,6 +59,7 @@ codex plugin marketplace add /absolute/path/to/llm-wiki
 Canonical explicit invocation:
 ```text
 @wiki research "hardware wallet threat models"
+@wiki collect "bitcoin memes" --wiki bitcoin
 @wiki ingest https://example.com/article
 @wiki audit --project coldcard-threat-model
 @wiki ll "codex plugin install gotchas"
@@ -319,6 +320,8 @@ Check your installed version:
 /wiki:research "What makes long form articles go viral?" --new-topic  # Question → decompose → playbook
 /wiki:thesis "fiber reduces neuroinflammation via SCFAs"  # Thesis-driven: evidence for + against → verdict
 /wiki:thesis "cold exposure upregulates BDNF" --min-time 1h  # Deep thesis investigation
+/wiki:collect "bitcoin memes" --wiki bitcoin  # Find, dedupe, catalog, and optionally inventory artifacts
+/wiki:collect "bitcoin memes" --scale medium --media reference --inventory corpus  # Catalog media without downloading binaries
 /wiki:query "How does fiber affect mood?"         # Ask the wiki
 /wiki:query "compare keto and mediterranean" --deep  # Deep cross-referenced answer
 /wiki:query --resume                              # Where did I leave off?
@@ -377,6 +380,11 @@ folder move plus `wikis.json`, hub index, and log updates.
 | `/wiki:ingest-collection <source>` | Bulk-ingest Git doc repos, BIP-style proposal sets, MediaWiki dumps/API sites, message archives, or Wayback CDX snapshots |
 | `/wiki:ingest-collection <source> --adapter git\|mediawiki-dump\|mediawiki-api\|csv-messages\|wayback-cdx` | Force a collection adapter |
 | `/wiki:ingest-collection <source> --limit <N> --dry-run` | Preview or cap a large collection import |
+| `/wiki:collect "<things>"` | Find, dedupe, and catalog artifacts, examples, resources, media, memes, tools, entities, or source candidates |
+| `/wiki:collect "<things>" --scale tiny\|small\|medium\|large\|huge` | Control write behavior by operational scale, not just row count |
+| `/wiki:collect "<things>" --media reference\|thumbnail\|archive` | Reference media by URL by default; cache thumbnails or originals only when explicit |
+| `/wiki:collect "<things>" --inventory records` | Create per-item inventory records when the collected set is small enough to stay useful |
+| `/wiki:collect "<things>" --inventory corpus` | Track a large, unstable, or media-heavy collection as one corpus record linked to the catalog output |
 | `/wiki:inventory list` | List durable tracking records as compact chat-friendly tables or bullets |
 | `/wiki:inventory list --view actions` | Show current inventory next actions without dumping full records |
 | `/wiki:inventory add <kind> "title"` | Add an inventory record after checking that inventory is the right layer |
@@ -468,26 +476,30 @@ The hub is just a registry — no content directories, no `.obsidian/`. All cont
 
 1. **Research** a topic — parallel agents search the web, ingest sources, and compile articles in one command
 2. **Ingest** additional sources — URLs, files, text, tweets (via Grok MCP), or bulk via inbox
-3. **Inventory** items, candidates, entities, corpora, watch lists, and next actions that should persist; the agent tells you when inventory is the wrong layer
-4. **Index datasets** that are too large for markdown — manifests, profiles, samples, and query recipes
-5. **Archive** whole topic wikis that should stay preserved but quiet
-6. **Compile** raw sources into synthesized wiki articles with cross-references and confidence scores
-7. **Query** the wiki — quick (indexes), standard (articles), or deep (everything active, archived indexes separated)
-8. **Lessons learned** — extract knowledge from the current session (errors, fixes, gotchas) into the wiki
-9. **Assess** a repo against the wiki — gap analysis: what aligns, what's missing, what the market offers
-10. **Lint** for consistency — broken links, missing indexes, orphan articles, archive registry drift
-11. **Output** artifacts — summaries, reports, slides — filed back into the wiki
+3. **Collect** catalogs of discoverable things — examples, media, memes, tools, projects, entities, or source candidates — then optionally inventory them
+4. **Inventory** items, candidates, entities, corpora, watch lists, and next actions that should persist; the agent tells you when inventory is the wrong layer
+5. **Index datasets** that are too large for markdown — manifests, profiles, samples, and query recipes
+6. **Archive** whole topic wikis that should stay preserved but quiet
+7. **Compile** raw sources into synthesized wiki articles with cross-references and confidence scores
+8. **Query** the wiki — quick (indexes), standard (articles), or deep (everything active, archived indexes separated)
+9. **Lessons learned** — extract knowledge from the current session (errors, fixes, gotchas) into the wiki
+10. **Assess** a repo against the wiki — gap analysis: what aligns, what's missing, what the market offers
+11. **Lint** for consistency — broken links, missing indexes, orphan articles, archive registry drift
+12. **Output** artifacts — summaries, reports, slides — filed back into the wiki
 
 ### Key Design
 
 - **One topic, one wiki** — each research area gets its own sub-wiki with isolated indexes. No cross-topic noise.
 - **Parallel research agents** — 5 standard, 8 deep, 10 retardmax. Each agent searches from a different angle.
+- **Collector workflow** — search-driven catalogs for objects, media, and
+  examples; saves a provenance map first, then inventories only the durable
+  subset.
 - **`_index.md` navigation** — every existing wiki-managed directory has an index. Claude reads indexes first, never scans blindly.
 - **Articles are synthesized**, not copied — they explain, contextualize, cross-reference.
 - **Raw is immutable** — once ingested, sources are never modified.
 - **Multi-wiki aware** — queries peek at sibling wiki indexes for overlap.
 - **Archive-aware** — archived topic wikis stay preserved under
-  `topics/.archive/` but are hidden from default query/compile/research/output
+  `topics/.archive/` but are hidden from default query/compile/research/collect/output
   and maintenance workflows.
 - **Dual-linking** — both `[[wikilinks]]` (Obsidian) and standard markdown links on every cross-reference. Works everywhere.
 - **Confidence scoring** — articles rated high/medium/low based on source quality and corroboration.
@@ -496,6 +508,9 @@ The hub is just a registry — no content directories, no `.obsidian/`. All cont
 - **Opinionated inventory** — durable tracking gets records; one-off sources stay
   ingest/query; large row-like data becomes datasets or collection ingests. Big
   pivots start with a sample table before records are written.
+- **Media-safe catalogs** — binary media stays referenced by URL unless caching
+  is explicit; raw sources remain textual evidence, and large media sets become
+  dataset manifests.
 - **Zero dependencies** — runs entirely on built-in tools (Claude Code, OpenCode, or Codex).
 
 ## Research Modes

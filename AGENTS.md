@@ -109,7 +109,7 @@ Same structure as a topic wiki but at `<project>/.wiki/`. Add `.wiki/` to `.giti
 9. **Confidence scoring.** Articles get `confidence: high|medium|low` in frontmatter based on source quality.
 10. **Archive is quiet preservation.** Archived topic wikis move to
 `HUB/topics/.archive/<slug>/`, remain structurally maintainable, and stay out of
-normal query/compile/research/output context unless explicitly included. Deep
+normal query/compile/research/collect/output context unless explicitly included. Deep
 queries may surface archived index matches separately.
 11. **Activity log.** Append every operation to `log.md`. Format: `## [YYYY-MM-DD] operation | Description`. Never edit existing entries.
 
@@ -304,7 +304,7 @@ asks for archived content or structural maintenance.
 ## [YYYY-MM-DD] operation | Description
 ```
 
-Operations: `init`, `ingest`, `ingest-collection`, `compile`, `query`, `lint`, `research`, `thesis`, `output`, `assess`, `refresh`, `librarian`, `audit`, `plan`, `project`, `inventory`, `dataset`, `archive`, `ll`
+Operations: `init`, `ingest`, `ingest-collection`, `compile`, `query`, `lint`, `research`, `thesis`, `collect`, `output`, `assess`, `refresh`, `librarian`, `audit`, `plan`, `project`, `inventory`, `dataset`, `archive`, `ll`
 
 ## Operations
 
@@ -482,6 +482,75 @@ Thesis-driven research. Activated via `--mode thesis "<claim>"` on the research 
 6. Anti-confirmation-bias: in `--min-time` mode, Round 2 focuses harder on the WEAKER side of Round 1's evidence
 7. Suggest follow-up theses derived from findings
 
+### Collect
+
+Find, catalog, deduplicate, and optionally inventory bounded sets of
+discoverable things: memes, examples, tools, projects, products, people,
+companies, quotes, source candidates, media, or other artifacts where the list
+itself is the deliverable.
+
+Collect outputs are a provenance-rich discovery layer for the LLM: "I found
+these things, with this context and confidence, but I have not yet decided what
+they mean." Later workflows may promote selected context pages into `raw/`,
+synthesize stable knowledge into `wiki/`, create durable tracking records in
+`inventory/`, or index large media/data collections in `datasets/`.
+
+Collect is distinct from research and collection ingest. Use research for an
+answer, thesis, or synthesized article. Use ingest-collection for structured
+upstream corpora such as Git repos, MediaWiki dumps/API sites, message archives,
+or Wayback CDX inventories. Use collect when the user asks to find, gather,
+catalog, curate, or inventory many objects. "All" means all discovered within
+the stated strategy and limit, not the whole internet.
+
+Scale is based on operational cost, not just row count:
+
+| Scale | Rows | Source Shape | Default Behavior |
+|-------|------|--------------|------------------|
+| tiny | 1-3 | Known items | Skip collect; use ingest, query, or inventory directly |
+| small | 4-25 | Discoverable with normal search | Write catalog output; per-item inventory allowed |
+| medium | 26-100 | Open web or mixed sources | Write catalog output; inventory as one corpus record by default |
+| large | 101-500 | Many candidates or unstable sources | Dry-run first; require confirmation |
+| huge | 500+ | Structured corpus, dataset, archive, or large media set | Use dataset or ingest-collection |
+
+Flow:
+1. State the fit judgment: appropriate for collect, too source-like, too
+   analytical, too operational, or too large.
+2. Define scope, scale, media policy, inclusion/exclusion criteria, collection
+   kind, tags, and a default cap.
+3. Search several angles, fetch only promising pages, and prefer provenance-rich
+   sources such as original posts, creator pages, official pages, GitHub repos,
+   archives, Know Your Meme-style references, or well-cited retrospectives.
+4. Extract catalog rows with `title`, `aliases`, `type`, `canonical_url`,
+   `media_url`, `source_url`, `source_title`, `media_filename`, origin
+   platform/publisher, creator/date when known, description, evidence,
+   `found_in_context`, provenance confidence, rights/license if visible, media
+   metadata/hashes when available, tags, and next action.
+5. Treat `found_in_context` as first-class provenance. Store context URL, title,
+   platform, found date, collector query, role (`original`, `near-original`,
+   `repost`, `reference`, `retrospective`, `usage-example`,
+   `archive-snapshot`, or `unclear`), surrounding label, context summary, and
+   confidence.
+6. Do not download binary media by default. Never put binaries in `raw/`; raw is
+   for source text. Catalog media URLs and metadata, optionally cache
+   thumbnails/originals under `output/assets/collect-<slug>/`, and use
+   `datasets/` for hundreds of media items.
+7. Deduplicate reposts/rehosts using canonical URLs, media URLs, aliases,
+   filenames, checksums/perceptual hashes when available, and context evidence.
+8. Save `output/collect-<query-slug>-YYYY-MM-DD.md` with `type: collection`,
+   `query`, `collect_kind`, `scale`, `media_policy`, source URLs, scope, search
+   strategy, catalog table, media handling, gaps, inventory recommendation, and
+   sources checked.
+9. Update `output/_index.md`, the master `_index.md`, and `log.md` with a
+   `collect` entry.
+10. If inventory is requested, create per-item records only for small durable
+   sets; otherwise create one `inventory/corpora/` record pointing at the
+   collection output. Use `kind: artifact` for memes/media artifacts, `item` for
+   products/tools/assets, `entity` for people/orgs, and `corpus` for large
+   source pools.
+
+Do not cite collect outputs as strong factual evidence in compiled articles.
+For factual claims, ingest the best supporting context pages into `raw/`.
+
 ### Retract
 
 Remove a regretted source and clean up its downstream effects. Requires `--reason`.
@@ -529,7 +598,8 @@ the user asks for detail. Common views: `summary`, `actions`, `items`,
 Other operations should be inventory-aware. Ingest links completed candidates;
 dataset manifests link to corpus records when next actions matter; compile and
 query may surface inventory gaps but must not cite inventory as factual
-evidence; research, audit, librarian, refresh, plan, assess, and output may
+evidence; collect writes catalog outputs first and only creates inventory for
+durable tracking state; research, audit, librarian, refresh, plan, assess, and output may
 propose records for durable follow-ups, but should not create large backlogs
 without a sample preview and explicit approval.
 
@@ -581,7 +651,7 @@ Subcommands:
 
 Other tools hide archive by default. Query, output, plan, and assess only use
 archived material with explicit archived inclusion. Compile, ingest,
-ingest-collection, research, inventory, dataset, project, and lessons-learned
+ingest-collection, research, collect, inventory, dataset, project, and lessons-learned
 reject an archived target unless the user restores or explicitly includes it,
 and explicit archived writes must stay inside the archived topic path. Librarian
 and refresh skip archived topics so old interests do not create maintenance
@@ -612,7 +682,7 @@ Find content by keyword, tag, or category. Scan indexes first (fast), then full-
 
 ### Output
 
-Generate artifacts from wiki content: summary, report, study-guide, slides, timeline, glossary, comparison.
+Generate artifacts from wiki content: summary, report, study-guide, slides, timeline, glossary, comparison. Collect uses output files too, but `type: collection` catalogs are produced by the collect workflow because they require discovery, dedupe, media policy, and inventory fit checks.
 
 **Retardmax mode**: Read ALL articles, generate immediately without planning structure. Ship rough, iterate later.
 
@@ -724,6 +794,7 @@ Silent when clean. Auto-fix trivial issues. Warn on structural problems. Never b
 - Inventory records: `descriptive-slug.md` (no date — durable tracking state)
 - Inventory views: `descriptive-view-slug.md` under `inventory/views/`
 - Dataset manifests: `datasets/descriptive-slug/MANIFEST.md`
+- Collection outputs: `collect-{query-slug}-{YYYY-MM-DD}.md`
 - Output artifacts: `{type}-{topic-slug}-{YYYY-MM-DD}.md`
 - All lowercase, hyphens, no special chars, max 60 chars
 

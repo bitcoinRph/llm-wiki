@@ -38,7 +38,7 @@ mkdir -p "$TARGET_SKILL/agents"
 cat > "$TARGET_SKILL/agents/openai.yaml" <<'EOF'
 interface:
   display_name: "Wiki Manager"
-  short_description: "Initialize, ingest collections, track inventory, index datasets, compile, audit, query, research, and lint llm-wiki knowledge bases."
+  short_description: "Initialize, ingest collections, collect catalogs, track inventory, index datasets, compile, audit, query, research, and lint llm-wiki knowledge bases."
   brand_color: "#2F855A"
   default_prompt: "Research a topic and compile it into a structured wiki."
 
@@ -63,9 +63,10 @@ frontmatter = """---
 name: wiki
 description: >
   LLM-compiled knowledge base manager for Codex. Use it to initialize, ingest,
-  import source collections, track inventory, index datasets, archive old topics, compile, query, lint, audit, research, plan, and generate outputs from topic-scoped wikis.
+  import source collections, collect catalogs, track inventory, index datasets, archive old topics, compile, query, lint, audit, research, plan, and generate outputs from topic-scoped wikis.
   Activates when the user mentions wiki workflows, knowledge-base management,
-  ingestion, collection ingestion, import wiki, inventory, source queue,
+  ingestion, collection ingestion, import wiki, collect, catalog, curate,
+  find all, inventory, source queue,
   candidate list, watch list, backlog, dataset, large data, data registry,
   dataset manifest, compilation, querying, linting, audit, research, librarian,
   scan quality, article quality, content review, output drift, provenance,
@@ -144,6 +145,7 @@ Choose the smallest workflow that matches the request, then load only the
 reference material you need for that workflow:
 
 - `ingest` and `ingest-collection` → `references/ingestion.md`
+- `collect` → `references/inventory.md` and `references/research-infrastructure.md`
 - `inventory` → `references/inventory.md`
 - `dataset` → `references/datasets.md`
 - `archive` → `references/archive.md`
@@ -158,13 +160,23 @@ reference material you need for that workflow:
 - wiki structure, indexes, log format, file placement, init → `references/wiki-structure.md`
 - hub lookup and path handling → `references/hub-resolution.md`
 
-Inventory is first-class operational state, not a silo. Ingest and collection
-workflows should suggest inventory when the user wants to track or decide later.
+Collect requests create bounded catalogs of discoverable things: artifacts,
+examples, resources, entities, tools, media, memes, or source candidates. Infer
+scale and media policy, record aliases plus `found_in_context` provenance,
+deduplicate candidates, write a `type: collection` output at
+`output/collect-<slug>-YYYY-MM-DD.md`, then create inventory only when the list
+is small and durable enough; otherwise create or suggest one corpus record.
+Never download binaries by default, never put binaries in `raw/`, and never
+present "all" as exhaustive beyond the stated strategy and limit.
+
+Inventory is first-class operational state, not a silo. Ingest, collection, and
+collect workflows should suggest inventory when the user wants to track or
+decide later.
 Dataset manifests should link to inventory records when next actions or
 acceptance state matter. Compile and query may surface inventory gaps, but
-factual claims still need raw/wiki sources. Research, audit, librarian, refresh,
-plan, output, and assess may propose durable follow-ups as inventory records,
-but larger pivots should start with a small sample preview.
+factual claims still need raw/wiki sources. Collect, research, audit,
+librarian, refresh, plan, output, and assess may propose durable follow-ups as
+inventory records, but larger pivots should start with a small sample preview.
 
 Keep the first response short and action-oriented. Read deeper references only
 after the user intent is clear or a write action is needed.

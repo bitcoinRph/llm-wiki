@@ -137,7 +137,7 @@ For `peek <query>`:
 ### Tool Interaction Reminder
 
 Archived topics are hidden from normal query, compile, ingest,
-ingest-collection, research, output, plan, assess, inventory, dataset, project,
+ingest-collection, research, collect, output, plan, assess, inventory, dataset, project,
 lessons-learned, librarian, refresh, and audit workflows. Deep query may surface
 archived index matches separately, but must not cite them as active evidence
 unless the user passes `--include-archived`.

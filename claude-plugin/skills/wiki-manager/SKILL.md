@@ -4,10 +4,12 @@ description: >
   LLM-compiled knowledge base manager. Activates when user works with wiki
   directories, mentions knowledge base management, asks knowledge questions
   in a project with a wiki, wants to ingest/import/compile/query/lint/audit knowledge,
-  track inventory, manage source queues, candidates, corpora, entities, watch lists,
+  collect/catalog discoverable artifacts and examples, track inventory,
+  manage source queues, candidates, corpora, entities, watch lists,
   dataset manifests, large datasets, or data that is too big for the wiki,
   archive old topic wikis, or uses /wiki commands. Also activates when user says "wiki", "knowledge base",
-  "ingest", "import wiki", "ingest collection", "compile wiki", "add to wiki", "search wiki", "audit", "librarian",
+  "ingest", "import wiki", "ingest collection", "collect", "catalog",
+  "curate", "find all", "compile wiki", "add to wiki", "search wiki", "audit", "librarian",
   "scan quality", "article quality", "content review", "output drift", "inventory",
   "ingest queue", "source queue", "candidate list", "watch list", "backlog",
   "dataset", "large data", "data registry", "dataset manifest",
@@ -119,6 +121,21 @@ Flow: structured upstream collection (Git repo, BIP-style proposal set, MediaWik
 See [references/inventory.md](references/inventory.md).
 Flow: Run an inventory fit check → track durable wiki-adjacent things (items, ingest candidates, entities, corpora, questions, tasks, watch items) as markdown records under `inventory/` → answer list requests from indexes/frontmatter as compact chat tables or bullets → optionally save derived views under `inventory/views/` → optionally convert legacy queue-like outputs through explicit dry-run-first migration. Inventory migration is additive and human-gated. Be explicit when something is too small for inventory, too large and should be a dataset/collection, or outside wiki scope.
 
+### Collect
+See [references/inventory.md](references/inventory.md) and
+[references/research-infrastructure.md](references/research-infrastructure.md).
+Flow: Scope a bounded catalog request → infer scale and media policy → search
+for candidate artifacts, examples, resources, entities, tools, media, or memes
+→ fetch only promising context pages → deduplicate aliases/reposts/rehosts →
+record `found_in_context` provenance and media metadata → save a
+`type: collection` output under `output/collect-<slug>-YYYY-MM-DD.md` →
+optionally create inventory records when the list is small and durable enough,
+or one corpus record when it is medium/large. Collect outputs are useful to the
+LLM as a staging layer before promotion into `raw/`, `wiki/`, `inventory`, or
+`datasets`; they do not replace raw sources for factual claims. Do not download
+binaries by default, never store binaries in `raw/`, and do not pretend that
+"all" means exhaustive beyond the stated strategy and limit.
+
 ### Dataset Registry
 See [references/datasets.md](references/datasets.md).
 Flow: Keep large or external datasets out of the wiki while indexing them through `datasets/<slug>/MANIFEST.md` → store locations, schema notes, small samples, profiles, and query recipes → answer list requests from `datasets/_index.md` plus manifest frontmatter only → optionally convert legacy dataset outputs through explicit dry-run-first migration. Dataset migration is additive and never copies the underlying data into the wiki.
@@ -127,7 +144,7 @@ Flow: Keep large or external datasets out of the wiki while indexing them throug
 See [references/archive.md](references/archive.md).
 Flow: Move whole topic wikis from `HUB/topics/<slug>/` to
 `HUB/topics/.archive/<slug>/` → mark `wikis.json` with `status: archived` →
-hide them from normal query/compile/research/output/maintenance context →
+hide them from normal query/compile/research/collect/output/maintenance context →
 restore by moving the folder back and setting `status: active`. Do not archive
 individual raw sources or compiled articles in v1.
 
@@ -161,6 +178,9 @@ notice it without treating it as factual evidence:
   about next actions, priority, acceptance state, or why the corpus matters.
 - Compile and query: use inventory to surface gaps, candidates, and next
   actions, but cite raw/wiki sources for factual claims.
+- Collect: write the catalog as an output first, then create per-item inventory
+  records only for small durable lists; use one corpus record for medium/large,
+  unstable, or media-heavy collections.
 - Research, audit, librarian, refresh, plan, and output: propose inventory
   records for durable follow-ups, stale items, source queues, or watch lists,
   but show a sample before creating a larger backlog.
@@ -184,7 +204,7 @@ Terminal links break when they wrap to a second line. Rules for all wiki operati
    /Users/name/wiki/topics/my-topic/output/report-2026-04-08.md
    ```
 
-See `references/research-infrastructure.md` § Agent Prompt Templates for examples. Applies to ingest, compile, research, output, assess.
+See `references/research-infrastructure.md` § Agent Prompt Templates for examples. Applies to ingest, compile, collect, research, output, assess.
 
 ## Activity Log
 
@@ -209,7 +229,7 @@ Track uncompiled sources by comparing `raw/_index.md` ingestion dates against th
 Automatically run a quick structural check when any of these triggers occur:
 
 ### Triggers
-- **After any write operation** (ingest, compile, research, output, inventory, dataset, archive) — verify what was just written
+- **After any write operation** (ingest, compile, collect, research, output, inventory, dataset, archive) — verify what was just written
 - **When the skill activates** and the wiki hasn't been linted in 7+ days (check "Last lint" in `_index.md`)
 - **When content is found in the wrong place** — articles in the global hub instead of a topic sub-wiki
 - **When a user mentions wiki problems** — "wiki is broken", "empty", "missing", "wrong"

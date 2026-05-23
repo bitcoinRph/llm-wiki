@@ -42,9 +42,10 @@ frontmatter = """---
 name: wiki-manager
 description: >
   LLM-compiled knowledge base manager for OpenCode. Use it to initialize, ingest,
-  import source collections, track inventory, index datasets, archive old topics, compile, query, lint, audit, research, plan, and generate outputs from topic-scoped wikis.
+  import source collections, collect catalogs, track inventory, index datasets, archive old topics, compile, query, lint, audit, research, plan, and generate outputs from topic-scoped wikis.
   Activates when the user mentions wiki workflows, knowledge-base management,
-  ingestion, collection ingestion, import wiki, inventory, source queue,
+  ingestion, collection ingestion, import wiki, collect, catalog, curate,
+  find all, inventory, source queue,
   candidate list, watch list, backlog, dataset, large data, data registry,
   dataset manifest, compilation, querying, linting, audit, research, librarian,
   scan quality, article quality, content review, output drift, provenance,

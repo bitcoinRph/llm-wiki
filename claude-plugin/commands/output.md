@@ -14,16 +14,18 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash(ls:*), Bash(date:*), Bash(pyt
 
 Generate an output artifact from wiki content based on $ARGUMENTS.
 
-Inventory awareness: if the requested output is really a durable queue,
-candidate list, watch list, source backlog, or next-action table, recommend
-`/wiki:inventory` instead of creating another loose output. If an output report
-discovers durable follow-ups, include a short "Inventory candidates" section
-with a sample shape and ask before creating records. Do not bury ongoing
-tracking state in a generated report.
+Inventory and collect awareness: if the requested output is really a durable
+queue, candidate list, watch list, source backlog, or next-action table,
+recommend `/wiki:inventory` instead of creating another loose output. If the
+request needs web discovery plus a catalog of artifacts, examples, memes,
+media, tools, entities, or source candidates, recommend `/wiki:collect`
+instead. If an output report discovers durable follow-ups, include a short
+"Inventory candidates" section with a sample shape and ask before creating
+records. Do not bury ongoing tracking state in a generated report.
 
 ### Parse $ARGUMENTS
 
-- **type** (required): One of: `summary`, `report`, `study-guide`, `slides`, `timeline`, `glossary`, `comparison`
+- **type** (required): One of: `summary`, `report`, `study-guide`, `slides`, `timeline`, `glossary`, `comparison`. Use `/wiki:collect` for `type: collection` catalogs because those require discovery, dedupe, media policy, and inventory fit checks.
 - **--topic <topic>**: Focus on a specific topic or concept (matches against tags and titles)
 - **--sources <paths>**: Comma-separated list of specific wiki article paths to use
 - **--with <wiki>**: Load a supplementary wiki as additional context. The primary wiki (`--wiki`) provides the **subject** (what to write about); `--with` wikis provide **craft/skill** knowledge (how to write it). Multiple `--with` flags allowed. Example: `--wiki quantum-computing --with article-writing` uses quantum-computing for domain content and article-writing for structure, hooks, and writing techniques.
