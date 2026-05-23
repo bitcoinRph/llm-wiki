@@ -19,6 +19,8 @@ LLM-compiled knowledge bases for any AI agent. Parallel multi-agent research, co
 
 ## Changelog
 
+**v0.10.2** — **Collector production hardening.** Collection-family topic slugs now prefer kind-first names such as `memes-bitcoin`, the scale boundary treats 500 rows as large and 501+ as huge, and media downloads call out timeouts, file-size caps, content-type checks, and IPv4 retry for hosts that hang.
+
 **v0.10.1** — **Collector media downloads.** `/wiki:collect` now downloads bounded public binary media into `output/assets/collect-<slug>/` by default for media-bearing collections, records local paths and hashes in the catalog, and keeps `--media reference` as the no-download opt-out.
 
 **v0.10.0** — **Collector catalogs.** Added `/wiki:collect` for provenance-rich catalogs of examples, artifacts, media, memes, tools, entities, and source candidates. Collect infers scale, captures aliases and found-in-context provenance, handles binaries as referenced assets by default, writes `output/collect-...` catalogs, and promotes only selected durable subsets into inventory, raw sources, wiki articles, or datasets.
@@ -61,7 +63,7 @@ codex plugin marketplace add /absolute/path/to/llm-wiki
 Canonical explicit invocation:
 ```text
 @wiki research "hardware wallet threat models"
-@wiki collect "bitcoin memes" --wiki bitcoin
+@wiki collect "bitcoin memes" --wiki memes-bitcoin
 @wiki ingest https://example.com/article
 @wiki audit --project coldcard-threat-model
 @wiki ll "codex plugin install gotchas"
@@ -322,7 +324,7 @@ Check your installed version:
 /wiki:research "What makes long form articles go viral?" --new-topic  # Question → decompose → playbook
 /wiki:thesis "fiber reduces neuroinflammation via SCFAs"  # Thesis-driven: evidence for + against → verdict
 /wiki:thesis "cold exposure upregulates BDNF" --min-time 1h  # Deep thesis investigation
-/wiki:collect "bitcoin memes" --wiki bitcoin  # Find, dedupe, download media, catalog, and optionally inventory artifacts
+/wiki:collect "bitcoin memes" --wiki memes-bitcoin  # Find, dedupe, download media, catalog, and optionally inventory artifacts
 /wiki:collect "bitcoin memes" --scale medium --media reference --inventory corpus  # Catalog media without binary downloads
 /wiki:query "How does fiber affect mood?"         # Ask the wiki
 /wiki:query "compare keto and mediterranean" --deep  # Deep cross-referenced answer
@@ -492,6 +494,9 @@ The hub is just a registry — no content directories, no `.obsidian/`. All cont
 ### Key Design
 
 - **One topic, one wiki** — each research area gets its own sub-wiki with isolated indexes. No cross-topic noise.
+- **Canonical collection slugs** — collection families use kind-first topic
+  names such as `memes-bitcoin`, `memes-ethereum`, or `tools-bitcoin` so
+  related catalogs group naturally as the hub grows.
 - **Parallel research agents** — 5 standard, 8 deep, 10 retardmax. Each agent searches from a different angle.
 - **Collector workflow** — search-driven catalogs for objects, media, and
   examples; saves a provenance map first, then inventories only the durable
@@ -512,7 +517,8 @@ The hub is just a registry — no content directories, no `.obsidian/`. All cont
   pivots start with a sample table before records are written.
 - **Media-safe catalogs** — bounded public binary media is cached under
   `output/assets/collect-<slug>/` by default; raw sources remain textual
-  evidence, and large media sets become dataset manifests.
+  evidence, and large media sets become dataset manifests. Bulk downloads use
+  timeouts, file-size caps, content-type checks, and IPv4 retry when needed.
 - **Zero dependencies** — runs entirely on built-in tools (Claude Code, OpenCode, or Codex).
 
 ## Research Modes

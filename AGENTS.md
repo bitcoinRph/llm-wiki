@@ -99,6 +99,10 @@ Same structure as a topic wiki but at `<project>/.wiki/`. Add `.wiki/` to `.giti
 ## Core Principles
 
 1. **One topic, one wiki.** Never mix unrelated topics. The hub is just a registry.
+   For collection families that can grow across subjects, prefer kind-first
+   topic slugs such as `memes-bitcoin`, `memes-ethereum`, `tools-bitcoin`, or
+   `examples-seedqr`. Use subject-first slugs when the subject is the primary
+   research area and the collection is only one artifact within that topic.
 2. **Indexes are navigation.** Every existing wiki-managed directory has `_index.md` with a contents table. Read indexes first, never scan blindly. Keep them current. Optional layers do not need placeholder indexes before they exist.
 3. **Raw is immutable.** Once ingested, sources are never modified. All synthesis happens in `wiki/`.
 4. **Articles are synthesized, not copied.** Draw from multiple sources, contextualize, connect. Think textbook, not clipboard.
@@ -510,7 +514,7 @@ Scale is based on operational cost, not just row count:
 | small | 4-25 | Discoverable with normal search | Write catalog output; per-item inventory allowed |
 | medium | 26-100 | Open web or mixed sources | Write catalog output; inventory as one corpus record by default |
 | large | 101-500 | Many candidates or unstable sources | Dry-run first; require confirmation |
-| huge | 500+ | Structured corpus, dataset, archive, or large media set | Use dataset or ingest-collection |
+| huge | 501+ | Structured corpus, dataset, archive, or large media set | Use dataset or ingest-collection |
 
 Flow:
 1. State the fit judgment: appropriate for collect, too source-like, too
@@ -534,7 +538,9 @@ Flow:
    default. Never put binaries in `raw/`; raw is for source text. Cache
    originals or thumbnails under `output/assets/collect-<slug>/`, record local
    paths, sizes, hashes, formats, and skipped/failed downloads in the catalog,
-   and use `datasets/` for hundreds of media items or very large payloads.
+   and use `datasets/` for hundreds of media items or very large payloads. Use
+   defensive download settings: timeouts, file-size caps, content-type checks,
+   and IPv4 retry (`curl -4`) when media hosts hang on IPv6.
 7. Deduplicate reposts/rehosts using canonical URLs, media URLs, aliases,
    filenames, checksums/perceptual hashes when available, and context evidence.
 8. Save `output/collect-<query-slug>-YYYY-MM-DD.md` with `type: collection`,

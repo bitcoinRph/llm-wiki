@@ -106,7 +106,7 @@ and inventory usefulness.
 | `small` | 4-25 | Discoverable with normal search | Write catalog output; per-item inventory allowed |
 | `medium` | 26-100 | Open web or mixed sources | Write catalog output; inventory as one corpus record by default |
 | `large` | 101-500 | Many candidates or unstable sources | Dry-run first; require confirmation; no per-item inventory by default |
-| `huge` | 500+ | Structured corpus, dataset, archive, or large media set | Use dataset or ingest-collection, not collect |
+| `huge` | 501+ | Structured corpus, dataset, archive, or large media set | Use dataset or ingest-collection, not collect |
 
 For open-web media such as "bitcoin memes", default to `medium` even if the
 initial target list is modest: provenance is messy, aliases are common, media
@@ -133,6 +133,15 @@ Start with a one-sentence fit judgment:
   corpus inventory record plus a dataset manifest or collection ingest.
 
 For ambiguous cases, state the recommended workflow before doing work.
+
+## Topic naming for collection families
+
+When creating or suggesting a topic wiki for a collection family, prefer a
+kind-first slug: `<kind>-<subject>`. This keeps related collections grouped as
+the wiki grows, for example `memes-bitcoin`, `memes-ethereum`,
+`tools-bitcoin`, or `examples-seedqr`. Use a subject-first slug only when the
+subject is clearly the primary research area and the collection is just one
+artifact inside that broader topic.
 
 ## Collection flow
 
@@ -206,6 +215,10 @@ For ambiguous cases, state the recommended workflow before doing work.
      candidate's direct public `media_url` when the payload is bounded and the
      URL does not require login, paywall bypass, anti-hotlink circumvention, or
      scraping around access controls.
+   - Use defensive download settings: set connection and total timeouts, cap
+     file size before writing large batches, verify `Content-Type` against the
+     expected media family, and retry transient failures sparingly. If a host
+     hangs on IPv6, retry with IPv4 (`curl -4`) before marking the row failed.
    - Never put binaries in `raw/`; raw is for immutable source text and source
      pages. Cached binaries belong under `output/assets/collect-<query-slug>/`
      or the relevant `output/projects/<slug>/assets/` folder.

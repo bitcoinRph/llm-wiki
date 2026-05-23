@@ -168,8 +168,12 @@ deduplicate candidates, write a `type: collection` output at
 is small and durable enough; otherwise create or suggest one corpus record.
 Download and hash bounded public binary media into
 `output/assets/collect-<slug>/` by default for media-bearing collections, never
-put binaries in `raw/`, and never present "all" as exhaustive beyond the stated
-strategy and limit.
+put binaries in `raw/`, and use defensive download settings: timeouts,
+file-size caps, content-type checks, and IPv4 retry (`curl -4`) when media
+hosts hang on IPv6. Use kind-first topic slugs such as `memes-bitcoin`,
+`memes-ethereum`, or `tools-bitcoin` for collection families that can grow
+across subjects. Never present "all" as exhaustive beyond the stated strategy
+and limit.
 
 Inventory is first-class operational state, not a silo. Ingest, collection, and
 collect workflows should suggest inventory when the user wants to track or

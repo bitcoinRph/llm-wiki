@@ -44,6 +44,11 @@ If no config exists and `~/wiki/` has `_index.md`, that works too. But config is
 
 **Topic sub-wikis are the default.** HUB is a hub — content lives in `HUB/topics/<name>/`. Each topic gets isolated indexes, sources, and articles. This keeps queries focused and prevents unrelated topics from polluting each other's search space.
 
+For collection families that will grow across subjects, prefer kind-first topic
+slugs such as `memes-bitcoin`, `memes-ethereum`, `tools-bitcoin`, or
+`examples-seedqr`. Use subject-first slugs when the subject is the primary
+research area and the collection is only one artifact within that topic.
+
 Resolution order:
 
 1. `--local` flag → `.wiki/` in current project
@@ -128,8 +133,10 @@ or one corpus record when it is medium/large. Collect outputs are useful to the
 LLM as a staging layer before promotion into `raw/`, `wiki/`, `inventory`, or
 `datasets`; they do not replace raw sources for factual claims. Download and
 hash bounded public binary media into `output/assets/collect-<slug>/` by
-default for media-bearing collections, never store binaries in `raw/`, and do
-not pretend that "all" means exhaustive beyond the stated strategy and limit.
+default for media-bearing collections, never store binaries in `raw/`, and use
+defensive download settings: timeouts, file-size caps, content-type checks, and
+IPv4 retry (`curl -4`) when media hosts hang on IPv6. Do not pretend that "all"
+means exhaustive beyond the stated strategy and limit.
 
 ### Dataset Registry
 See [references/datasets.md](references/datasets.md).

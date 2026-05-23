@@ -39,6 +39,11 @@ If no config exists and `~/wiki/` has `_index.md`, that works too. But config is
 
 **Topic sub-wikis are the default.** HUB is a hub — content lives in `HUB/topics/<name>/`. Each topic gets isolated indexes, sources, and articles. This keeps queries focused and prevents unrelated topics from polluting each other's search space.
 
+For collection families that will grow across subjects, prefer kind-first topic
+slugs such as `memes-bitcoin`, `memes-ethereum`, `tools-bitcoin`, or
+`examples-seedqr`. Use subject-first slugs when the subject is the primary
+research area and the collection is only one artifact within that topic.
+
 Resolution order:
 
 1. `--local` flag → `.wiki/` in current project
@@ -125,8 +130,12 @@ deduplicate candidates, write a `type: collection` output at
 is small and durable enough; otherwise create or suggest one corpus record.
 Download and hash bounded public binary media into
 `output/assets/collect-<slug>/` by default for media-bearing collections, never
-put binaries in `raw/`, and never present "all" as exhaustive beyond the stated
-strategy and limit.
+put binaries in `raw/`, and use defensive download settings: timeouts,
+file-size caps, content-type checks, and IPv4 retry (`curl -4`) when media
+hosts hang on IPv6. Use kind-first topic slugs such as `memes-bitcoin`,
+`memes-ethereum`, or `tools-bitcoin` for collection families that can grow
+across subjects. Never present "all" as exhaustive beyond the stated strategy
+and limit.
 
 Inventory is first-class operational state, not a silo. Ingest, collection, and
 collect workflows should suggest inventory when the user wants to track or
