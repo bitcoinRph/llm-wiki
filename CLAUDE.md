@@ -37,6 +37,7 @@ git -C ~/.claude/plugins/marketplaces/llm-wiki remote set-url origin https://git
 ./tests/test-plugin-validate.sh   # plugin manifest + command frontmatter
 ./tests/test-structure.sh          # wiki fixture validation (84 assertions)
 ./tests/test-local-cli-lint.sh     # local scripts/llm-wiki lint helper
+./tests/test-session-capture.sh    # deterministic session capture helper
 ./tests/test-codex-sync.sh         # Codex plugin mirror matches Claude source
 ./tests/test-opencode-sync.sh     # OpenCode plugin mirror matches Claude source
 ```

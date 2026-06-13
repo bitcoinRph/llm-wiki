@@ -39,6 +39,7 @@ The hub is lightweight — NO content, just a registry.
 ├── wikis.json          # Registry of all topic wikis
 ├── _index.md           # Lists topic wikis with stats
 ├── log.md              # Global activity log
+├── .sessions/          # Optional automated agent-session capture (hidden operational layer)
 └── topics/
     ├── nutrition/      # Each topic is a full, isolated wiki
     ├── robotics/
@@ -116,6 +117,7 @@ Same structure as a topic wiki but at `<project>/.wiki/`. Add `.wiki/` to `.giti
 normal query/compile/research/collect/output context unless explicitly included. Deep
 queries may surface archived index matches separately.
 11. **Activity log.** Append every operation to `log.md`. Format: `## [YYYY-MM-DD] operation | Description`. Never edit existing entries.
+12. **Session capture is operational memory.** Automated harness-session capture lives under `HUB/.sessions/` or `.wiki/.sessions/`. It can preserve redacted checkpoints automatically, but topic wiki promotion is explicit and user-directed.
 
 ## File Formats
 

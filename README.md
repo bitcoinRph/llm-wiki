@@ -9,7 +9,7 @@
 
 [github.com/nvk/llm-wiki](https://github.com/nvk/llm-wiki)
 
-LLM-compiled knowledge bases for any AI agent. Parallel multi-agent research, collector catalogs, thesis-driven investigation, source ingestion, wiki compilation, truth-seeking audits, querying, and artifact generation. Ships as a Claude Code plugin, an OpenAI Codex plugin, an OpenCode instruction file, or a portable AGENTS.md for any other LLM agent. Obsidian-compatible.
+LLM-compiled knowledge bases for any AI agent. Parallel multi-agent research, collector catalogs, automated session capture, thesis-driven investigation, source ingestion, wiki compilation, truth-seeking audits, querying, and artifact generation. Ships as a Claude Code plugin, an OpenAI Codex plugin, an OpenCode instruction file, or a portable AGENTS.md for any other LLM agent. Obsidian-compatible.
 
 ---
 
@@ -18,6 +18,8 @@ LLM-compiled knowledge bases for any AI agent. Parallel multi-agent research, co
 ---
 
 ## Changelog
+
+**Unreleased** — **Automated session capture.** Added an opt-in `session` workflow and deterministic `llm-wiki-session` helper that writes redacted hook events, state JSON, and markdown digests under `HUB/.sessions/`; Codex plugin packaging now bundles disabled-by-default lifecycle hooks that activate after `session enable`.
 
 **v0.10.2** — **Collector production hardening.** Collection-family topic slugs now prefer kind-first names such as `memes-bitcoin`, the scale boundary treats 500 rows as large and 501+ as huge, and media downloads call out timeouts, file-size caps, content-type checks, and IPv4 retry for hosts that hang.
 
@@ -66,6 +68,7 @@ Canonical explicit invocation:
 @wiki collect "bitcoin memes" --wiki memes-bitcoin
 @wiki ingest https://example.com/article
 @wiki audit --project coldcard-threat-model
+@wiki session enable --mode balanced
 @wiki ll "codex plugin install gotchas"
 ```
 
@@ -364,6 +367,8 @@ checks without an agent:
 ./scripts/llm-wiki archive --hub /path/to/hub topic old-interest --reason "No longer active"
 ./scripts/llm-wiki archive --hub /path/to/hub list --archived
 ./scripts/llm-wiki archive --hub /path/to/hub restore old-interest
+./scripts/llm-wiki-session --hub /path/to/hub enable --mode balanced
+./scripts/llm-wiki-session --hub /path/to/hub rehydrate --cwd "$PWD"
 ```
 
 This local helper covers structural checks that do not require an LLM. The
@@ -404,6 +409,10 @@ folder move plus `wikis.json`, hub index, and log updates.
 | `/wiki:archive topic <slug> --reason "why"` | Move a topic wiki to `topics/.archive/<slug>` and hide it from default context |
 | `/wiki:archive restore <slug>` | Restore an archived topic wiki to active status |
 | `/wiki:archive peek <query>` | Search archived topic indexes without reading archived articles |
+| `/wiki:session enable --mode balanced` | Opt in to automated redacted session capture and soft rehydration |
+| `/wiki:session capture` | Force a manual session digest checkpoint |
+| `/wiki:session rehydrate` | Print compact context from matching session digests |
+| `/wiki:session promote <id> --topic <slug>` | Promote a distilled digest into a topic raw note |
 | `/wiki:compile` | Compile new sources into wiki articles |
 | `/wiki:compile --full` | Recompile everything from scratch |
 | `/wiki:query <question>` | Q&A against the wiki (standard depth) |
@@ -454,6 +463,7 @@ All commands accept `--wiki <name>` to target a specific topic wiki and `--local
 ├── wikis.json                          # Registry of all topic wikis
 ├── _index.md                           # Lists topic wikis with stats
 ├── log.md                              # Global activity log
+├── .sessions/                          # Optional automated session capture
 └── topics/                             # Each topic is an isolated wiki
     ├── nutrition/                      # Example topic wiki
     │   ├── .obsidian/                  # Optional Obsidian vault config
@@ -486,10 +496,11 @@ The hub is just a registry — no content directories, no `.obsidian/`. All cont
 6. **Archive** whole topic wikis that should stay preserved but quiet
 7. **Compile** raw sources into synthesized wiki articles with cross-references and confidence scores
 8. **Query** the wiki — quick (indexes), standard (articles), or deep (everything active, archived indexes separated)
-9. **Lessons learned** — extract knowledge from the current session (errors, fixes, gotchas) into the wiki
-10. **Assess** a repo against the wiki — gap analysis: what aligns, what's missing, what the market offers
-11. **Lint** for consistency — broken links, missing indexes, orphan articles, archive registry drift
-12. **Output** artifacts — summaries, reports, slides — filed back into the wiki
+9. **Session capture** — automatically preserve redacted Codex/Claude/OpenCode/Gemini checkpoints under `.sessions/` and rehydrate future turns
+10. **Lessons learned** — extract knowledge from the current session (errors, fixes, gotchas) into the wiki
+11. **Assess** a repo against the wiki — gap analysis: what aligns, what's missing, what the market offers
+12. **Lint** for consistency — broken links, missing indexes, orphan articles, archive registry drift
+13. **Output** artifacts — summaries, reports, slides — filed back into the wiki
 
 ### Key Design
 

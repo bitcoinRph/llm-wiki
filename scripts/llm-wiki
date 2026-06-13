@@ -69,8 +69,9 @@ ROOT_ALLOWED = {
     ".thesis-session.json",
     ".session-events.jsonl",
     ".session-checkpoint.json",
+    ".sessions",
 }
-HUB_ALLOWED = {"wikis.json", "_index.md", "log.md", "topics"}
+HUB_ALLOWED = {"wikis.json", "_index.md", "log.md", "topics", ".sessions"}
 RAW_ALLOWED = {"_index.md", "articles", "papers", "repos", "notes", "data"}
 WIKI_ALLOWED = {"_index.md", "concepts", "topics", "references", "theses"}
 INVENTORY_ALLOWED = {

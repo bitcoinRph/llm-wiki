@@ -1,0 +1,79 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${PLUGIN_ROOT}/hooks/llm_wiki_session.py hook --harness codex --if-enabled",
+            "timeout": 5,
+            "statusMessage": "Loading llm-wiki session context"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${PLUGIN_ROOT}/hooks/llm_wiki_session.py hook --harness codex --if-enabled",
+            "timeout": 5,
+            "statusMessage": "Checking llm-wiki session context"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${PLUGIN_ROOT}/hooks/llm_wiki_session.py hook --harness codex --if-enabled",
+            "timeout": 5,
+            "statusMessage": "Recording llm-wiki session event"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${PLUGIN_ROOT}/hooks/llm_wiki_session.py hook --harness codex --if-enabled",
+            "timeout": 5,
+            "statusMessage": "Capturing llm-wiki pre-compact session context"
+          }
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${PLUGIN_ROOT}/hooks/llm_wiki_session.py hook --harness codex --if-enabled",
+            "timeout": 5,
+            "statusMessage": "Capturing llm-wiki post-compact session context"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${PLUGIN_ROOT}/hooks/llm_wiki_session.py hook --harness codex --if-enabled",
+            "timeout": 5,
+            "statusMessage": "Saving llm-wiki session checkpoint"
+          }
+        ]
+      }
+    ]
+  }
+}

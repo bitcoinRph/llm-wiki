@@ -276,6 +276,12 @@ expect_success \
   "hub lint stays scoped to hub registry" \
   "$CLI" lint "$hub_scope"
 
+mkdir -p "$hub_scope/.sessions/state/codex"
+echo '{}' > "$hub_scope/.sessions/state/codex/example.json"
+expect_success \
+  "hub lint allows operational .sessions layer" \
+  "$CLI" lint "$hub_scope"
+
 portable_home="$tmpdir/portable-home"
 portable_hub="$portable_home/Library/Mobile Documents/com~apple~CloudDocs/wiki"
 mkdir -p "$portable_home/.config/llm-wiki" "$portable_hub/topics/portable-topic"

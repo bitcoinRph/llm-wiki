@@ -2,14 +2,14 @@
 name: wiki
 description: >
   LLM-compiled knowledge base manager for Codex. Use it to initialize, ingest,
-  import source collections, collect catalogs, track inventory, index datasets, archive old topics, compile, query, lint, audit, research, plan, and generate outputs from topic-scoped wikis.
+  import source collections, collect catalogs, track inventory, index datasets, archive old topics, compile, query, lint, audit, research, plan, capture or rehydrate agent session context, and generate outputs from topic-scoped wikis.
   Activates when the user mentions wiki workflows, knowledge-base management,
   ingestion, collection ingestion, import wiki, collect, catalog, curate,
   find all, inventory, source queue,
   candidate list, watch list, backlog, dataset, large data, data registry,
   dataset manifest, compilation, querying, linting, audit, research, librarian,
   scan quality, article quality, content review, output drift, provenance,
-  archive wiki, archive topic, restore wiki, implementation plan, or uses
+  archive wiki, archive topic, restore wiki, session capture, capture context, rehydrate, resume from session, implementation plan, or uses
   /wiki-style shorthand in a repo with .wiki/, ~/wiki/, or a configured hub path.
 ---
 
@@ -81,6 +81,11 @@ They remain structurally maintainable through explicit archive/lint operations.
 Deep queries may surface archived index matches separately, but archived content
 must not influence new synthesis unless the user explicitly includes it.
 
+11. **Session capture is operational memory.** Harness session digests live in
+`HUB/.sessions/` or `.wiki/.sessions/`, not in topic `raw/` by default.
+Automated hooks may capture redacted checkpoints, but promotion into topic wikis
+is explicit and user-directed.
+
 ## Ambient Behavior
 
 When this skill activates outside of an explicit `@wiki` invocation or `/wiki`-style shorthand:
@@ -121,6 +126,7 @@ reference material you need for that workflow:
 - `librarian` → `references/librarian.md`
 - wiki structure, indexes, log format, file placement, init → `references/wiki-structure.md`
 - hub lookup and path handling → `references/hub-resolution.md`
+- session capture, automated hooks, rehydration, promotion → `references/sessions.md`
 
 Collect requests create bounded catalogs of discoverable things: artifacts,
 examples, resources, entities, tools, media, memes, or source candidates. Infer

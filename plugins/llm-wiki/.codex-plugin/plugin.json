@@ -1,7 +1,7 @@
 {
   "name": "wiki",
   "version": "0.10.2",
-  "description": "LLM-compiled knowledge bases for Codex. Build topic-scoped wikis, collect provenance-rich catalogs, archive old topics, track inventory, index datasets, ingest sources and external collections, compile articles, run truth-seeking audits, query, lint, research, and generate outputs.",
+  "description": "LLM-compiled knowledge bases for Codex. Build topic-scoped wikis, collect provenance-rich catalogs, archive old topics, track inventory, index datasets, capture and rehydrate session context, ingest sources, compile articles, audit, query, lint, research, and generate outputs.",
   "author": {
     "name": "nvk",
     "url": "https://github.com/nvk"
@@ -21,13 +21,16 @@
     "collect",
     "inventory",
     "datasets",
-    "archive"
+    "archive",
+    "sessions",
+    "hooks",
+    "context"
   ],
   "skills": "./skills/",
   "interface": {
     "displayName": "LLM Wiki",
-    "shortDescription": "Build, collect, archive, inventory, index data, audit, and maintain research wikis",
-    "longDescription": "Bundle the llm-wiki workflow for Codex: initialize a wiki, collect provenance-rich catalogs of discoverable artifacts, media, examples, tools, and source candidates, archive old topics so they stay preserved but quiet, track inventory, index large datasets without copying them into the wiki, ingest sources and external collections, compile articles, audit outputs and provenance, query knowledge, lint structure, run research, and generate outputs.",
+    "shortDescription": "Build, collect, archive, inventory, index data, capture sessions, audit, and maintain research wikis",
+    "longDescription": "Bundle the llm-wiki workflow for Codex: initialize a wiki, collect provenance-rich catalogs, archive old topics, track inventory, index datasets, capture and rehydrate session context, ingest sources and external collections, compile articles, audit outputs and provenance, query knowledge, lint structure, run research, and generate outputs.",
     "developerName": "nvk",
     "category": "Productivity",
     "capabilities": [
@@ -43,7 +46,8 @@
       "Index this large dataset with a manifest, schema notes, samples, and query recipes.",
       "Ingest these notes or an external source collection into my wiki and update the indexes.",
       "Audit this wiki output and tell me if I can trust it.",
-      "Lint this wiki and fix structural issues."
+      "Lint this wiki and fix structural issues.",
+      "Enable automated session capture and rehydrate context for this project."
     ],
     "brandColor": "#2F855A"
   }

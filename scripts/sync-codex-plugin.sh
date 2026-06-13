@@ -7,6 +7,7 @@ TARGET_PLUGIN="$ROOT/plugins/llm-wiki"
 TARGET_SKILL="$TARGET_PLUGIN/skills/wiki"
 CLAUDE_MANIFEST="$ROOT/claude-plugin/.claude-plugin/plugin.json"
 CODEX_MANIFEST="$TARGET_PLUGIN/.codex-plugin/plugin.json"
+SESSION_HELPER="$ROOT/scripts/llm-wiki-session"
 
 if [ ! -d "$SOURCE_SKILL" ]; then
   echo "Missing source skill: $SOURCE_SKILL" >&2
@@ -23,6 +24,11 @@ if [ ! -f "$CODEX_MANIFEST" ]; then
   exit 1
 fi
 
+if [ ! -f "$SESSION_HELPER" ]; then
+  echo "Missing session helper: $SESSION_HELPER" >&2
+  exit 1
+fi
+
 mkdir -p "$TARGET_PLUGIN/skills"
 # The Codex marketplace caches plugin contents eagerly, so references/ must be
 # copied into the generated tree rather than left as a symlink. agents/ is
@@ -34,13 +40,98 @@ rsync -a --delete \
   "$SOURCE_SKILL/" "$TARGET_SKILL/"
 
 mkdir -p "$TARGET_SKILL/agents"
+mkdir -p "$TARGET_PLUGIN/hooks"
+cp "$SESSION_HELPER" "$TARGET_PLUGIN/hooks/llm_wiki_session.py"
+chmod 0755 "$TARGET_PLUGIN/hooks/llm_wiki_session.py"
+
+cat > "$TARGET_PLUGIN/hooks/hooks.json" <<'EOF'
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${PLUGIN_ROOT}/hooks/llm_wiki_session.py hook --harness codex --if-enabled",
+            "timeout": 5,
+            "statusMessage": "Loading llm-wiki session context"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${PLUGIN_ROOT}/hooks/llm_wiki_session.py hook --harness codex --if-enabled",
+            "timeout": 5,
+            "statusMessage": "Checking llm-wiki session context"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${PLUGIN_ROOT}/hooks/llm_wiki_session.py hook --harness codex --if-enabled",
+            "timeout": 5,
+            "statusMessage": "Recording llm-wiki session event"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${PLUGIN_ROOT}/hooks/llm_wiki_session.py hook --harness codex --if-enabled",
+            "timeout": 5,
+            "statusMessage": "Capturing llm-wiki pre-compact session context"
+          }
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${PLUGIN_ROOT}/hooks/llm_wiki_session.py hook --harness codex --if-enabled",
+            "timeout": 5,
+            "statusMessage": "Capturing llm-wiki post-compact session context"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${PLUGIN_ROOT}/hooks/llm_wiki_session.py hook --harness codex --if-enabled",
+            "timeout": 5,
+            "statusMessage": "Saving llm-wiki session checkpoint"
+          }
+        ]
+      }
+    ]
+  }
+}
+EOF
 
 cat > "$TARGET_SKILL/agents/openai.yaml" <<'EOF'
 interface:
   display_name: "Wiki Manager"
-  short_description: "Initialize, ingest collections, collect catalogs, track inventory, index datasets, compile, audit, query, research, and lint llm-wiki knowledge bases."
+  short_description: "Initialize, ingest collections, capture sessions, track inventory, index datasets, compile, audit, query, research, and lint llm-wiki knowledge bases."
   brand_color: "#2F855A"
-  default_prompt: "Research a topic and compile it into a structured wiki."
+  default_prompt: "Research a topic, capture a session, or compile knowledge into a structured wiki."
 
 policy:
   allow_implicit_invocation: true
@@ -63,14 +154,14 @@ frontmatter = """---
 name: wiki
 description: >
   LLM-compiled knowledge base manager for Codex. Use it to initialize, ingest,
-  import source collections, collect catalogs, track inventory, index datasets, archive old topics, compile, query, lint, audit, research, plan, and generate outputs from topic-scoped wikis.
+  import source collections, collect catalogs, track inventory, index datasets, archive old topics, compile, query, lint, audit, research, plan, capture or rehydrate agent session context, and generate outputs from topic-scoped wikis.
   Activates when the user mentions wiki workflows, knowledge-base management,
   ingestion, collection ingestion, import wiki, collect, catalog, curate,
   find all, inventory, source queue,
   candidate list, watch list, backlog, dataset, large data, data registry,
   dataset manifest, compilation, querying, linting, audit, research, librarian,
   scan quality, article quality, content review, output drift, provenance,
-  archive wiki, archive topic, restore wiki, implementation plan, or uses
+  archive wiki, archive topic, restore wiki, session capture, capture context, rehydrate, resume from session, implementation plan, or uses
   /wiki-style shorthand in a repo with .wiki/, ~/wiki/, or a configured hub path.
 ---
 """
@@ -159,6 +250,7 @@ reference material you need for that workflow:
 - `librarian` → `references/librarian.md`
 - wiki structure, indexes, log format, file placement, init → `references/wiki-structure.md`
 - hub lookup and path handling → `references/hub-resolution.md`
+- session capture, automated hooks, rehydration, promotion → `references/sessions.md`
 
 Collect requests create bounded catalogs of discoverable things: artifacts,
 examples, resources, entities, tools, media, memes, or source candidates. Infer

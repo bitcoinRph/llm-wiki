@@ -9,7 +9,7 @@ PLUGIN_JSON="$PLUGIN_DIR/.claude-plugin/plugin.json"
 PASS=0
 FAIL=0
 TOTAL=0
-REFERENCE_NAMES="archive audit command-prelude compilation datasets hub-resolution indexing ingestion inventory librarian linting projects research-infrastructure wiki-structure"
+REFERENCE_NAMES="archive audit command-prelude compilation datasets hub-resolution indexing ingestion inventory librarian linting projects research-infrastructure sessions wiki-structure"
 
 log_pass() { PASS=$((PASS + 1)); TOTAL=$((TOTAL + 1)); printf "  \033[32mPASS\033[0m: %s\n" "$1"; }
 log_fail() { FAIL=$((FAIL + 1)); TOTAL=$((TOTAL + 1)); printf "  \033[31mFAIL\033[0m: %s — %s\n" "$1" "$2"; }
@@ -114,6 +114,28 @@ if [ -f "$CODEX_MANIFEST" ]; then
   fi
 else
   log_fail ".codex-plugin/plugin.json not found" "missing file"
+fi
+
+
+# Codex bundled hooks for opt-in automated session capture.
+echo ""
+echo "--- Codex bundled hooks ---"
+CODEX_HOOKS="$CODEX_PLUGIN/hooks/hooks.json"
+CODEX_SESSION_HELPER="$CODEX_PLUGIN/hooks/llm_wiki_session.py"
+if [ -f "$CODEX_HOOKS" ]; then
+  log_pass "Codex hooks/hooks.json exists"
+  if python3 -c "import json; json.load(open('$CODEX_HOOKS'))" 2>/dev/null; then
+    log_pass "Codex hooks/hooks.json is valid JSON"
+  else
+    log_fail "Codex hooks/hooks.json invalid" "parse error"
+  fi
+else
+  log_fail "Codex hooks/hooks.json missing" "missing file"
+fi
+if [ -x "$CODEX_SESSION_HELPER" ]; then
+  log_pass "Codex session hook helper exists and is executable"
+else
+  log_fail "Codex session hook helper missing" "expected executable hooks/llm_wiki_session.py"
 fi
 
 # Codex marketplace entry

@@ -2,14 +2,15 @@
 name: wiki-manager
 description: >
   LLM-compiled knowledge base manager for OpenCode. Use it to initialize, ingest,
-  import source collections, collect catalogs, track inventory, index datasets, archive old topics, compile, query, lint, audit, research, plan, and generate outputs from topic-scoped wikis.
+  import source collections, collect catalogs, track inventory, index datasets, archive old topics, compile, query, lint, audit, research, plan, capture or rehydrate agent session context, and generate outputs from topic-scoped wikis.
   Activates when the user mentions wiki workflows, knowledge-base management,
   ingestion, collection ingestion, import wiki, collect, catalog, curate,
   find all, inventory, source queue,
   candidate list, watch list, backlog, dataset, large data, data registry,
   dataset manifest, compilation, querying, linting, audit, research, librarian,
   scan quality, article quality, content review, output drift, provenance,
-  archive wiki, archive topic, restore wiki, lessons learned, implementation
+  archive wiki, archive topic, restore wiki, session capture, capture
+  context, rehydrate, resume from session, lessons learned, implementation
   plan, or uses wiki-related shorthand in a repo with .wiki/, ~/wiki/, or a
   configured hub path.
 ---
@@ -85,6 +86,11 @@ See [references/wiki-structure.md](references/wiki-structure.md) for the complet
 They remain structurally maintainable through explicit archive/lint operations.
 Deep queries may surface archived index matches separately, but archived content
 must not influence new synthesis unless the user explicitly includes it.
+
+11. **Session capture is operational memory.** Harness session digests live in
+`HUB/.sessions/` or `.wiki/.sessions/`, not in topic `raw/` by default.
+Automated hooks may capture redacted checkpoints, but promotion into topic wikis
+is explicit and user-directed.
 
 ## Ambient Behavior
 
@@ -187,6 +193,15 @@ notice it without treating it as factual evidence:
   records for durable follow-ups, stale items, source queues, or watch lists,
   but show a sample before creating a larger backlog.
 
+### Sessions
+See [references/sessions.md](references/sessions.md).
+Flow: Opt in with `session enable` → harness hooks append redacted events under
+`HUB/.sessions/queue/` → session state and markdown digests update at tool-count,
+compaction, stop/session-end, or manual checkpoints → `session rehydrate` returns
+a compact context block → `session promote` explicitly copies the distilled
+digest into a topic `raw/notes/` note. Automated capture is allowed; automated
+promotion is not.
+
 ### Output
 Flow: Gather relevant articles → generate artifact (summary/report/slides/etc) → save to `output/` → update indexes.
 
@@ -239,7 +254,7 @@ Automatically run a quick structural check when any of these triggers occur:
 
 ### Quick Structure Check (lightweight, runs inline — not a full lint)
 
-1. **Hub integrity**: The hub (HUB) should ONLY contain `wikis.json`, `_index.md`, `log.md`, and `topics/`. If `raw/`, `wiki/`, `inventory/`, `datasets/`, `output/`, `inbox/`, or `config.md` exist at the hub level → **warn, do not delete**. These may hold user data from an older wiki layout. Suggest running the lint --fix workflow, which will move contents to the appropriate topic wiki, repair archive registry drift, or quarantine to `inbox/.unknown/` per C11/C12/C16/C17/C19 in `references/linting.md`.
+1. **Hub integrity**: The hub (HUB) should ONLY contain `wikis.json`, `_index.md`, `log.md`, `topics/`, and optional `.sessions/`. If `raw/`, `wiki/`, `inventory/`, `datasets/`, `output/`, `inbox/`, or `config.md` exist at the hub level → **warn, do not delete**. These may hold user data from an older wiki layout. Suggest running the lint --fix workflow, which will move contents to the appropriate topic wiki, repair archive registry drift, or quarantine to `inbox/.unknown/` per C11/C12/C16/C17/C19 in `references/linting.md`.
 
 2. **Index freshness**: For the active topic wiki, compare actual file counts in `raw/`, `wiki/`, `inventory/`, and `datasets/` subdirectories against the rows in their `_index.md`. Ignore maintenance/report areas such as `.librarian/` and `.audit/`. If mismatched → auto-fix by regenerating the affected directory index from frontmatter and removing dead entries.
 
@@ -291,3 +306,13 @@ checkpoint are the durable provenance trail.
 - Session files are ephemeral — never included in structural health checks or index counts
 - Session files should NOT be committed to git
 - `.session-events.jsonl` and `.session-checkpoint.json` should normally be preserved after completion so `/wiki:audit` can classify provenance as `replayable` instead of `partial`
+
+### Harness Session Capture
+
+Automated Codex/Claude/OpenCode/Gemini session capture uses `HUB/.sessions/`
+(or `.wiki/.sessions/` for local wikis). This is a hidden operational layer for
+redacted hook events, state JSON, derived indexes, and markdown session digests.
+It is not topic evidence until explicitly promoted.
+
+See `references/sessions.md` for the storage layout, config modes, hook adapter
+contract, rehydration behavior, and promotion rules.
