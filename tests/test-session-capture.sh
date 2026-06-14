@@ -78,6 +78,19 @@ else
   log_fail "enable writes balanced config" "$(cat "$hub/.sessions/config.json" 2>/dev/null || true)"
 fi
 
+plugin_root_with_space="$tmpdir/plugin root"
+ln -s "$PROJECT_ROOT/plugins/llm-wiki" "$plugin_root_with_space"
+mkdir -p "$tmpdir/home/.config/llm-wiki"
+printf '{"hub_path":"%s"}\n' "$hub" > "$tmpdir/home/.config/llm-wiki/config.json"
+manifest_hook_cmd="$(python3 -c 'import json; from pathlib import Path; hooks=json.loads(Path("plugins/llm-wiki/hooks/hooks.json").read_text())["hooks"]; print(hooks["PostToolUse"][0]["hooks"][0]["command"])')"
+printf '{"session_id":"manifest-space","hook_event_name":"PostToolUse","cwd":"%s","tool_name":"Bash"}' "$PWD" \
+  | HOME="$tmpdir/home" PLUGIN_ROOT="$plugin_root_with_space" sh -c "$manifest_hook_cmd"
+if [ -f "$hub/.sessions/state/codex/manifest-space.json" ]; then
+  log_pass "Codex bundled hook command handles PLUGIN_ROOT paths with spaces"
+else
+  log_fail "Codex bundled hook command handles PLUGIN_ROOT paths with spaces" "$manifest_hook_cmd"
+fi
+
 payload1=$(printf '{"session_id":"test-session","hook_event_name":"PostToolUse","cwd":"%s","prompt":"do not store this raw prompt text","tool_name":"Bash","tool_input":{"api_key":"sk-12345678901234567890","command":"curl -H Authorization: Bearer abcdefghijklmnop"}}' "$PWD")
 payload2=$(printf '{"session_id":"test-session","hook_event_name":"PostToolUse","cwd":"%s","tool_name":"Bash"}' "$PWD")
 printf '%s' "$payload1" | "$SESSION" --hub "$hub" hook --harness codex --if-enabled
@@ -124,7 +137,7 @@ else
 fi
 
 list_output="$("$SESSION" --hub "$hub" list --json 2>&1)"
-if python3 -c 'import json,sys; data=json.load(sys.stdin); assert data["sessions"][0]["llm_wiki_session_id"] == "codex:test-session"' <<<"$list_output"; then
+if python3 -c 'import json,sys; data=json.load(sys.stdin); assert any(s.get("llm_wiki_session_id") == "codex:test-session" for s in data["sessions"])' <<<"$list_output"; then
   log_pass "list --json reports captured session"
 else
   log_fail "list --json reports captured session" "$list_output"

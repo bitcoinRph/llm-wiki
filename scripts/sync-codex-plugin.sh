@@ -52,7 +52,7 @@ cat > "$TARGET_PLUGIN/hooks/hooks.json" <<'EOF'
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ${PLUGIN_ROOT}/hooks/llm_wiki_session.py hook --harness codex --if-enabled",
+            "command": "python3 \"${PLUGIN_ROOT}/hooks/llm_wiki_session.py\" hook --harness codex --if-enabled",
             "timeout": 5,
             "statusMessage": "Loading llm-wiki session context"
           }
@@ -64,7 +64,7 @@ cat > "$TARGET_PLUGIN/hooks/hooks.json" <<'EOF'
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ${PLUGIN_ROOT}/hooks/llm_wiki_session.py hook --harness codex --if-enabled",
+            "command": "python3 \"${PLUGIN_ROOT}/hooks/llm_wiki_session.py\" hook --harness codex --if-enabled",
             "timeout": 5,
             "statusMessage": "Checking llm-wiki session context"
           }
@@ -77,7 +77,7 @@ cat > "$TARGET_PLUGIN/hooks/hooks.json" <<'EOF'
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ${PLUGIN_ROOT}/hooks/llm_wiki_session.py hook --harness codex --if-enabled",
+            "command": "python3 \"${PLUGIN_ROOT}/hooks/llm_wiki_session.py\" hook --harness codex --if-enabled",
             "timeout": 5,
             "statusMessage": "Recording llm-wiki session event"
           }
@@ -90,7 +90,7 @@ cat > "$TARGET_PLUGIN/hooks/hooks.json" <<'EOF'
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ${PLUGIN_ROOT}/hooks/llm_wiki_session.py hook --harness codex --if-enabled",
+            "command": "python3 \"${PLUGIN_ROOT}/hooks/llm_wiki_session.py\" hook --harness codex --if-enabled",
             "timeout": 5,
             "statusMessage": "Capturing llm-wiki pre-compact session context"
           }
@@ -103,7 +103,7 @@ cat > "$TARGET_PLUGIN/hooks/hooks.json" <<'EOF'
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ${PLUGIN_ROOT}/hooks/llm_wiki_session.py hook --harness codex --if-enabled",
+            "command": "python3 \"${PLUGIN_ROOT}/hooks/llm_wiki_session.py\" hook --harness codex --if-enabled",
             "timeout": 5,
             "statusMessage": "Capturing llm-wiki post-compact session context"
           }
@@ -115,7 +115,7 @@ cat > "$TARGET_PLUGIN/hooks/hooks.json" <<'EOF'
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ${PLUGIN_ROOT}/hooks/llm_wiki_session.py hook --harness codex --if-enabled",
+            "command": "python3 \"${PLUGIN_ROOT}/hooks/llm_wiki_session.py\" hook --harness codex --if-enabled",
             "timeout": 5,
             "statusMessage": "Saving llm-wiki session checkpoint"
           }
