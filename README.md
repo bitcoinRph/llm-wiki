@@ -19,7 +19,7 @@ LLM-compiled knowledge bases for any AI agent. Parallel multi-agent research, co
 
 ## Changelog
 
-**Unreleased** — **Automated session capture.** Added a default-on `session` workflow and deterministic `llm-wiki-session` helper that writes redacted hook events, state JSON, and markdown digests under `HUB/.sessions/`; users can opt out with `session disable`, and promotion into topic wikis remains explicit.
+**v0.11.0** — **Automated session capture.** Added a default-on `session` workflow and deterministic `llm-wiki-session` helper that writes redacted hook events, state JSON, and markdown digests under `HUB/.sessions/`; users can opt out with `session disable`, and promotion into topic wikis remains explicit.
 
 **v0.10.2** — **Collector production hardening.** Collection-family topic slugs now prefer kind-first names such as `memes-bitcoin`, the scale boundary treats 500 rows as large and 501+ as huge, and media downloads call out timeouts, file-size caps, content-type checks, and IPv4 retry for hosts that hang.
 
